@@ -1,90 +1,243 @@
 #include <iostream>
-
 using namespace std;
 
-template <typename T>
-struct Node {
-    T data;
-    Node<T>* next;
-};
 
 template <typename T>
 class LinkedList {
 private:
-    Node<T>* head;
+    struct Node {
+        T data;
+        Node* next;
+        Node() : next(nullptr) {}
+        Node(int x) : data(x), next(nullptr) {}
+        Node(int x, Node *next) : data(x), next(next) {}
+        void killself(){delete this;}
+    };
 
-Node<T>* merge(Node<T>* a, Node<T>* b) {
-    Node<T>* dummyHead = new Node<T>();
-    Node<T>* current = dummyHead;
+    Node* head;
 
-    while (a != nullptr && b != nullptr) {
-        if (a->data < b->data) {
+    Node* merge(Node* a, Node* b) {
+        Node* dummyHead = new Node();
+        Node* current = dummyHead;
+
+        while (a != nullptr && b != nullptr) {
+            if (a->data < b->data) {
+                current->next = a;
+                a = a->next;
+            } else {
+                current->next = b;
+                b = b->next;
+            }
+            current = current->next;
+        }
+
+        if (a != nullptr) {
             current->next = a;
-            a = a->next;
         } else {
             current->next = b;
-            b = b->next;
         }
-        current = current->next;
+
+        Node* sortedHead = dummyHead->next;
+        delete dummyHead;
+        return sortedHead;
     }
 
-    if (a != nullptr) {
-        current->next = a;
-    } else {
-        current->next = b;
+    Node* mergeSort(Node* head) {
+        if (head == nullptr || head->next == nullptr) {
+            return head;
+        }
+
+        Node* slow = head;
+        Node* fast = head->next;
+
+        while (fast != nullptr && fast->next != nullptr) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+
+        Node* mid = slow->next;
+        slow->next = nullptr;
+
+        Node* left = mergeSort(head);
+        Node* right = mergeSort(mid);
+
+        return merge(left, right);
     }
-
-    Node<T>* sortedHead = dummyHead->next;
-    delete dummyHead;
-    return sortedHead;
-}
-
-Node<T>* mergeSort(Node<T>* head) {
-    if (head == nullptr || head->next == nullptr) {
-        return head;
-    }
-
-    Node<T>* slow = head;
-    Node<T>* fast = head->next;
-
-    while (fast != nullptr && fast->next != nullptr) {
-        slow = slow->next;
-        fast = fast->next->next;
-    }
-
-    Node<T>* mid = slow->next;
-    slow->next = nullptr;
-
-    Node<T>* left = mergeSort(head);
-    Node<T>* right = mergeSort(mid);
-
-    return merge(left, right);
-}
 
 public:
 
-    LinkedList();
-    ~LinkedList();
 
-    T front();
-    T back();
+    LinkedList() {
+        head = nullptr;
+    }
 
-    void push_front(T data);
-    void push_back(T data);
 
-    void pop_front();
-    void pop_back();
+    ~LinkedList() {
+        while(head != nullptr) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
 
-    T& operator[](int index);
+    T front() {
+        if(head == nullptr) throw runtime_error("List is empty!");
+        return head->data;
+    }
 
-    bool empty();
-    int size();
 
-    void clear();
+    T back() {
+        if(head == nullptr) throw runtime_error("List is empty!");  
+        Node* temp = head;
+        while(temp->next != nullptr) temp = temp->next;
+        return temp->data;
+    }
 
-    void printList();
 
-    void sort();
-    void reverse();
+    void push_front(T data) {
+        Node* node = new Node(data);
+        if(head == nullptr){
+            head = node;
+            return;
+        }
+        
+        node->data = data;
+        node->next = head;
+        head = node;
+    }
+
+
+    void push_back(T data) {
+        Node* node = new Node(data);
+        if(head == nullptr){
+            head = node;
+            return;
+        }
+        
+        Node* temp = head;
+        while (temp->next != nullptr) {
+            temp = temp->next;
+        }
+        temp->next = node;
+    }
+
+    
+
+    T pop_front() {
+        if (head == nullptr) {
+            throw runtime_error("List is empty!");
+        }
+        Node* temp = head;
+        T val = temp->data;
+        head = head->next;
+        delete temp;
+        return val;
+    }
+
+
+    T pop_back() { 
+        if (head == nullptr) {
+            throw runtime_error("List is empty!");
+        }
+
+        T ret;
+        if (head->next == nullptr) {
+            ret = head->data;
+            delete head;
+            head = nullptr;
+        }else{
+            Node* prev = nullptr;
+            Node* cur = head;
+            while(cur->next != nullptr) {
+                prev = cur;
+                cur = cur->next;
+            }
+            ret = cur->data;
+            delete cur;
+            prev->next = nullptr;
+        }
+        return ret;
+    }
+
+    
+    T& operator[](int index) {
+        int c = 0;
+        Node* temp = head;
+
+        while(temp != nullptr) {
+            if (c == index) {
+                return temp->data;
+            }
+            c++;
+            temp = temp->next;
+        }
+
+        throw runtime_error("Index out of bounds!");
+    }
+    
+    bool empty() {
+        return head == nullptr;
+    }
+
+    
+    int size() {
+        if(head == nullptr) return 0;
+        Node* temp = head;
+        int count = 0;
+        while(temp != nullptr) {
+            count++;
+            temp = temp->next;
+        }
+        return count;
+    }
+
+    
+    void clear() {
+        while(head != nullptr) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    
+    void printList() {
+        if(head == nullptr) throw "List is empty!";
+        Node* current = head;
+        while (current != nullptr) {
+            cout << current->data << " ";
+            current = current->next;
+        }
+        cout << endl;
+    }
+
+
+    void sort() {
+        head = mergeSort(head);
+    }
+
+
+    void reverse() {
+        Node* temp = head;
+        Node* direccion_siguiente;
+
+        int c = 0;
+
+        while(temp != nullptr) {
+            Node* temp2 = temp;
+            temp = temp->next;
+            if (c == 0) {
+                temp2->next = nullptr;
+                direccion_siguiente = temp2;
+                c++;
+                continue;
+            }
+
+            temp2->next = direccion_siguiente;
+            direccion_siguiente = temp2;
+        }   
+
+        head = direccion_siguiente;
+    }
 };
 
