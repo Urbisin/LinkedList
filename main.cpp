@@ -3,8 +3,7 @@
 
 using namespace std;
 
-//generado con chatgpt 
-
+// generado con chatgpt
 int main() {
     // Create a LinkedList of integers
     LinkedList<int> intList;
@@ -38,7 +37,6 @@ int main() {
     }
 
     // Test pop_front
-// Test pop_front
     try {
         intList.pop_front();
         cout << "List after pop_front: ";
@@ -50,7 +48,6 @@ int main() {
     } catch (const char* msg) {
         cerr << "Error: " << msg << endl;
     }
-
 
     // Test pop_back
     try {
@@ -87,6 +84,26 @@ int main() {
         intList.reverse();
         cout << "Reversed List: ";
         intList.printList(); // Should output: 5 4 3
+    } catch (const char* msg) {
+        cerr << "Error: " << msg << endl;
+    }
+
+    // Test operator[]
+try {
+    intList.push_back(10);
+    intList.push_back(20);
+    intList.push_back(30);
+
+    cout << "Element at index 0: " << intList[0] << endl; // Should output: 10
+    cout << "Element at index 1: " << intList[1] << endl; // Should output: 20
+    cout << "Element at index 2: " << intList[2] << endl; // Should output: 30
+
+    // Try accessing an index out of bounds
+    try {
+        cout << "Element at index 3: " << intList[6] << endl; // Should throw an exception
+    } catch (const std::runtime_error& e) {
+        cerr << "Error: " << e.what() << endl;
+    }
     } catch (const char* msg) {
         cerr << "Error: " << msg << endl;
     }

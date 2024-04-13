@@ -101,7 +101,6 @@ public:
             return;
         }
         
-        node->data = data;
         node->next = head;
         head = node;
     }
@@ -202,7 +201,7 @@ public:
 
     
     void printList() {
-        if(head == nullptr) throw "List is empty!";
+        if(head == nullptr) runtime_error("List is empty!");
         Node* current = head;
         while (current != nullptr) {
             cout << current->data << " ";
